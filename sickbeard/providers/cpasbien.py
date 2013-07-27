@@ -74,6 +74,7 @@ class CpasbienProvider(generic.TorrentProvider):
 
         results = []
         searchUrl = self.url + '/recherche/'
+        
 
         data = urllib.urlencode({'champ_recherche': searchString})
 
@@ -90,16 +91,18 @@ class CpasbienProvider(generic.TorrentProvider):
             title = str(link.text).lower().strip()  
             pageURL = link['href']
 
-            if "vostfr" in title and (not show.subtitles) and show.audio_lang == "fr":
+            if "vostfr" in title and ((not show.subtitles) or show.audio_lang == "fr"):
                 continue
 
             torrentPage = self.opener.open( pageURL )
             torrentSoup = BeautifulSoup( torrentPage )
 
-            downloadTorrentLink = torrentSoup.find("a", title=u"Cliquer ici pour télécharger ce torrent")
+            #downloadTorrentLink = torrentSoup.find("a", title.startswith('Cliquer'))
+            tmp = pageURL.split('/')[6].replace('.html','.torrent')
+            downloadTorrentLink = ('http://www.cpasbien.me/_torrents/%s' % tmp)
             if downloadTorrentLink:
                 
-                downloadURL = downloadTorrentLink['href']
+                downloadURL = downloadTorrentLink
 
                 if "720p" in title:
                     if "bluray" in title:
